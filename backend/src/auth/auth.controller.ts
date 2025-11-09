@@ -3,6 +3,7 @@ import { AuthService } from './services/auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { plainToInstance } from 'class-transformer';
 import { UserResponseDto } from '../user/dto/user-response.dto';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -10,10 +11,28 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() registerData: CreateUserDto) {
-    const user = await this.authService.register(registerData);
+    const { user, accessToken } = await this.authService.register(registerData);
 
-    return plainToInstance(UserResponseDto, user, {
-      excludeExtraneousValues: true,
-    });
+    return {
+      accessToken,
+      user: plainToInstance(UserResponseDto, user, {
+        excludeExtraneousValues: true,
+      }),
+    };
+  }
+
+  @Post('login')
+  async login(@Body() loginData: LoginUserDto) {
+    const { user, accessToken } = await this.authService.login(
+      loginData.email,
+      loginData.password,
+    );
+
+    return {
+      accessToken,
+      user: plainToInstance(UserResponseDto, user, {
+        excludeExtraneousValues: true,
+      }),
+    };
   }
 }
