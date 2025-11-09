@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashService } from '../shared/hash/hash.service';
+import { Role } from './types/role.enum';
 
 @Injectable()
 export class UserService {
@@ -26,7 +27,7 @@ export class UserService {
       email: data.email,
     });
 
-    if (!existingUser) {
+    if (existingUser) {
       throw new BadRequestException(
         `User with email ${data.email} already exists`,
       );
@@ -37,13 +38,14 @@ export class UserService {
     const newUser = this.userRepository.create({
       ...data,
       password: hashedPassword,
+      role: data.role || Role.Student,
     });
     return this.userRepository.save(newUser);
   }
 
   async update(id: string, data: UpdateUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
-      where: { id: parseInt(id, 10) },
+      where: { id },
     });
 
     if (!user) {
@@ -70,12 +72,12 @@ export class UserService {
   }
 
   async delete(id: string) {
-    const user = await this.userRepository.findBy({ id: parseInt(id) });
+    const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException(`User with id ${id} was not found`);
     }
 
-    return this.userRepository.delete({ id: parseInt(id) });
+    return this.userRepository.delete(id);
   }
 }

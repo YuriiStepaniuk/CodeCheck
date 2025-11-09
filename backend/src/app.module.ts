@@ -4,6 +4,7 @@ import { envValidation } from './config/env.validation';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
 import { HashModule } from './shared/hash/hash.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { HashModule } from './shared/hash/hash.module';
     DatabaseModule,
     UserModule,
     HashModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
