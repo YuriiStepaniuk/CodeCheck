@@ -1,7 +1,7 @@
 import { API_URL } from '@/lib/constants/api-urls';
 import axiosClient from '../config/axios-config';
-import { RegisterUserSchema } from '@/app/register/register-user-schema';
-import { LoginUserSchema } from '@/app/login/login-schema';
+import { RegisterUserSchema } from '@/app/(auth)/register/register-user-schema';
+import { LoginUserSchema } from '@/app/(auth)/login/login-schema';
 
 class AuthService {
   constructor() {}

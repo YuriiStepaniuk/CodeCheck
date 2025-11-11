@@ -2,10 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from './types/role.enum';
+import { Student } from '../student/student.entity';
+import { Teacher } from '../teacher/teacher.entity';
 
 @Entity('user')
 export class User {
@@ -32,4 +35,10 @@ export class User {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToOne(() => Student, (student) => student.user)
+  student: Student;
+
+  @OneToOne(() => Teacher, (teacher) => teacher.user)
+  teacher: Teacher;
 }
