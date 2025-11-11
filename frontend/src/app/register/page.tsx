@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RegisterUserSchema, registerUserSchema } from './register-user-schema';
 import { useRegister } from '../../../hooks/user/useRegister';
+import Link from 'next/link';
 
 const RegisterPage = () => {
   const {
@@ -26,7 +27,7 @@ const RegisterPage = () => {
       confirmPassword: '',
     },
   });
-  const { mutate: registerUser, isLoading } = useRegister();
+  const { mutate: registerUser, isPending } = useRegister();
 
   const onSubmit = async (data: RegisterUserSchema) => {
     registerUser(data);
@@ -94,17 +95,17 @@ const RegisterPage = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full mt-4" disabled={isLoading}>
-              {isLoading ? 'Registering...' : 'Register'}
+            <Button type="submit" className="w-full mt-4" disabled={isPending}>
+              {isPending ? 'Registering...' : 'Register'}
             </Button>
 
             <Separator className="my-4" />
 
             <p className="text-sm text-center text-gray-500">
               Already have an account?{' '}
-              <a href="/login" className="text-blue-500 underline">
+              <Link href="/login" className="text-blue-500 underline">
                 Log in
-              </a>
+              </Link>
             </p>
           </form>
         </CardContent>
