@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { RegisterUserSchema, registerUserSchema } from './register-user-schema';
-import { useRegister } from '../../../../hooks/user/useRegister';
+import { useRegister } from '../../../hooks/user/useRegister';
 import Link from 'next/link';
 
 const RegisterPage = () => {

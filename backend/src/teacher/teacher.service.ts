@@ -13,4 +13,10 @@ export class TeacherService {
   async findAll(): Promise<Teacher[]> {
     return this.teacherRepo.find();
   }
+
+  async create(data: { userId: string }): Promise<Teacher> {
+    const teacher = this.teacherRepo.create(data);
+
+    return this.teacherRepo.save(teacher);
+  }
 }

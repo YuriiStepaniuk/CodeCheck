@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '../../config/query-client-config';
+import { queryClient } from '../config/query-client-config';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 

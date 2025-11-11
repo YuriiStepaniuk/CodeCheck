@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoginUserSchema, loginUserSchema } from './login-schema';
-import { useLogin } from '../../../../hooks/user/useLogin';
+import { useLogin } from '../../../hooks/user/useLogin';
 import Link from 'next/link';
 
 const LoginPage = () => {

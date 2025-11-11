@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Student } from './student.entity';
 
 @Injectable()
@@ -12,5 +12,18 @@ export class StudentService {
 
   async findAll(): Promise<Student[]> {
     return this.studentRepo.find();
+  }
+
+  async create(
+    data: { userId: string },
+    manager?: EntityManager,
+  ): Promise<Student> {
+    const repository = manager
+      ? manager.getRepository(Student)
+      : this.studentRepo;
+
+    const student = repository.create(data);
+
+    return repository.save(student);
   }
 }

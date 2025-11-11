@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashService } from '../shared/hash/hash.service';
@@ -26,8 +26,12 @@ export class UserService {
     return this.userRepository.findOneBy({ email });
   }
 
-  async create(data: CreateUserDto): Promise<User> {
-    const existingUser = await this.userRepository.findOneBy({
+  async create(data: CreateUserDto, manager?: EntityManager): Promise<User> {
+    const repository = manager
+      ? manager.getRepository(User)
+      : this.userRepository;
+
+    const existingUser = await repository.findOneBy({
       email: data.email,
     });
 
@@ -39,12 +43,13 @@ export class UserService {
 
     const hashedPassword = await this.hashService.hash(data.password);
 
-    const newUser = this.userRepository.create({
+    const newUser = repository.create({
       ...data,
       password: hashedPassword,
-      role: data.role || Role.Student,
+      role: Role.Student,
     });
-    return this.userRepository.save(newUser);
+
+    return repository.save(newUser);
   }
 
   async update(id: string, data: UpdateUserDto): Promise<User> {

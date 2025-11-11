@@ -3,27 +3,45 @@ import { UserService } from '../../user/user.service';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 import { HashService } from '../../shared/hash/hash.service';
 import { JwtService } from '@nestjs/jwt';
+import { StudentService } from '../../student/student.service';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly dataSource: DataSource,
     private readonly userService: UserService,
     private readonly hashService: HashService,
     private readonly jwtService: JwtService,
+    private readonly studentService: StudentService,
   ) {}
 
   async register(data: CreateUserDto) {
-    const user = await this.userService.create(data);
+    const queryRunner = this.dataSource.createQueryRunner();
 
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      role: user.role,
-    };
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const accessToken = this.jwtService.sign(payload);
+    try {
+      const user = await this.userService.create(data, queryRunner.manager);
 
-    return { user, accessToken };
+      await this.studentService.create(
+        { userId: user.id },
+        queryRunner.manager,
+      );
+
+      await queryRunner.commitTransaction();
+
+      const payload = { sub: user.id, email: user.email, role: user.role };
+      const accessToken = this.jwtService.sign(payload);
+
+      return { user, accessToken };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async login(email: string, password: string) {

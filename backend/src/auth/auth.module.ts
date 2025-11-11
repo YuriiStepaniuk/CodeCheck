@@ -5,10 +5,12 @@ import { UserModule } from '../user/user.module';
 import { HashModule } from '../shared/hash/hash.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { StudentModule } from '../student/student.module';
 
 @Module({
   imports: [
     UserModule,
+    StudentModule,
     HashModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
