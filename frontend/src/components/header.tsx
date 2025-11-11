@@ -1,28 +1,33 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useLogout } from '@/hooks/user/useLogout';
+import { useAuthStore } from '@/lib/stores/auth-store';
 
 export default function Header() {
-  const [user, setUser] = useState<{ name: string; avatar: string } | null>(
-    null
-  );
-
-  const handleLogin = () => {
-    setUser({ name: 'John Doe', avatar: '/glove.svg' });
-  };
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
+  const { mutate: logout, isPending } = useLogout();
 
   const handleLogout = () => {
-    setUser(null);
+    logout();
   };
 
   return (
     <header className="w-full bg-white dark:bg-gray-900 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+          {/* Logo */}
           <div className="flex items-center space-x-2">
             <Image src="/globe.svg" alt="Logo" width={32} height={32} />
             <span className="font-bold text-xl text-gray-900 dark:text-white">
@@ -30,6 +35,7 @@ export default function Header() {
             </span>
           </div>
 
+          {/* Navigation */}
           <nav className="hidden md:flex space-x-4">
             <Link
               href="/"
@@ -51,34 +57,44 @@ export default function Header() {
             </Link>
           </nav>
 
+          {/* Auth Section */}
           <div className="flex items-center space-x-4">
             {user ? (
-              <div className="flex items-center space-x-2">
-                <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-                <Button
-                  onClick={handleLogout}
-                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Logout
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center space-x-2">
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>
+                        {user.firstName[0]}
+                        {user.lastName[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-gray-700 dark:text-gray-200">
+                      {user.firstName}
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => router.push('/profile')}>
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout} disabled={isPending}>
+                    {isPending ? 'Logging out...' : 'Logout'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <div className="flex space-x-2">
-                <Button
-                  onClick={handleLogin}
-                  className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
+                <Button variant="default" onClick={() => router.push('/login')}>
                   Login
                 </Button>
-                <Link
-                  href="/register"
-                  className="px-3 py-1 border border-blue-500 text-blue-500 rounded hover:bg-blue-50 dark:hover:bg-gray-800"
+                <Button
+                  variant="outline"
+                  onClick={() => router.push('/register')}
                 >
                   Register
-                </Link>
+                </Button>
               </div>
             )}
           </div>
