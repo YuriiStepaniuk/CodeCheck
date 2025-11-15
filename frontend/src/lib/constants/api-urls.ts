@@ -4,4 +4,8 @@ export const API_URL = {
     LOGIN: '/auth/login',
     LOGOUT: '/auth/logout',
   },
+
+  ADMIN: {
+    CREATE_TEACHER: '/admin/create-teacher',
+  },
 } as const;
