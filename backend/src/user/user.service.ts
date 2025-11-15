@@ -26,7 +26,11 @@ export class UserService {
     return this.userRepository.findOneBy({ email });
   }
 
-  async create(data: CreateUserDto, manager?: EntityManager): Promise<User> {
+  async create(
+    data: CreateUserDto,
+    manager?: EntityManager,
+    role: Role = Role.Student,
+  ): Promise<User> {
     const repository = manager
       ? manager.getRepository(User)
       : this.userRepository;
@@ -46,7 +50,7 @@ export class UserService {
     const newUser = repository.create({
       ...data,
       password: hashedPassword,
-      role: Role.Student,
+      role,
     });
 
     return repository.save(newUser);

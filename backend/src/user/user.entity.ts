@@ -9,7 +9,7 @@ import {
 import { Role } from './types/role.enum';
 import { Student } from '../student/student.entity';
 import { Teacher } from '../teacher/teacher.entity';
-
+import { Admin } from '../admin/admin.entity';
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -41,4 +41,7 @@ export class User {
 
   @OneToOne(() => Teacher, (teacher) => teacher.user)
   teacher: Teacher;
+
+  @OneToOne(() => Admin, (admin) => admin.user)
+  admin: Admin;
 }
