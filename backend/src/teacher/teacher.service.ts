@@ -14,6 +14,12 @@ export class TeacherService {
     return this.teacherRepo.find();
   }
 
+  async findByUserId(userId: string): Promise<Teacher | null> {
+    const teacher = await this.teacherRepo.findOne({ where: { userId } });
+
+    return teacher;
+  }
+
   async create(
     data: { userId: string },
     manager?: EntityManager,

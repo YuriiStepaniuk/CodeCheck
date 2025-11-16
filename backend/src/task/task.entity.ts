@@ -9,12 +9,7 @@ import {
 } from 'typeorm';
 import { Teacher } from '../teacher/teacher.entity';
 import { StudentTask } from '../assignment/entities/student-task.entity';
-
-export enum TaskDifficulty {
-  EASY = 'EASY',
-  MEDIUM = 'MEDIUM',
-  HARD = 'HARD',
-}
+import { TaskDifficulty } from './types/task-difficulty';
 
 @Entity('task')
 export class Task {

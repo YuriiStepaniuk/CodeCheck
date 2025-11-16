@@ -31,5 +31,5 @@ export function RoleProtectedLayout({
     return <p className="text-center mt-12">Checking permissions...</p>;
   }
 
-  return <>{children}</>;
+  return <div className="mt-8 max-w-4xl mx-auto px-4">{children}</div>;
 }

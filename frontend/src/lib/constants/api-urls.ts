@@ -8,4 +8,8 @@ export const API_URL = {
   ADMIN: {
     CREATE_TEACHER: '/admin/create-teacher',
   },
+
+  TASKS: {
+    CREATE_TASK: '/tasks',
+  },
 } as const;
