@@ -1,4 +1,4 @@
-import { CreateTeacherSchema } from '@/app/admin/teachers/new/create-teacher.schema';
+import { CreateTeacherSchema } from '@/app/(roles)/admin/teachers/new/create-teacher.schema';
 import axiosClient from '@/config/axios-config';
 import { API_URL } from '@/lib/constants/api-urls';
 import { CreateTeacherResponse } from '@/types/teacher';

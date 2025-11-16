@@ -1,4 +1,4 @@
-import { CreateTeacherSchema } from '@/app/admin/teachers/new/create-teacher.schema';
+import { CreateTeacherSchema } from '@/app/(roles)/admin/teachers/new/create-teacher.schema';
 import { getErrorMessage } from '@/lib/utils/getErrorMessage';
 import { adminService } from '@/services/admin-service';
 import { useMutation } from '@tanstack/react-query';

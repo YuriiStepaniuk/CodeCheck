@@ -1,10 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import {
-  createTeacherSchema,
-  CreateTeacherSchema,
-} from './create-teacher.schema';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -17,6 +14,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCreateTeacher } from '@/hooks/admin/useCreateTeacher';
+import {
+  createTeacherSchema,
+  CreateTeacherSchema,
+} from './create-teacher.schema';
 
 export default function CreateTeacherPage() {
   const form = useForm<CreateTeacherSchema>({
