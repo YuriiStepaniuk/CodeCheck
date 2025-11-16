@@ -16,6 +16,22 @@ export class TaskService {
     return this.taskRepo.find();
   }
 
+  async findByTeacherId(userId: string): Promise<Task[] | null> {
+    const teacher = await this.teacherService.findByUserId(userId);
+
+    if (!teacher) {
+      throw new BadRequestException();
+    }
+
+    return this.taskRepo.find({
+      where: {
+        teacher: {
+          id: teacher.id,
+        },
+      },
+    });
+  }
+
   async create(dto: CreateTaskDto, userId: string): Promise<Task> {
     const teacher = await this.teacherService.findByUserId(userId);
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { RolesGuard } from '../shared/guards/roles.guard';
@@ -22,5 +22,13 @@ export class TaskController {
     const userId = req.user.sub;
 
     return this.taskService.create(data, userId);
+  }
+
+  @Get('my-tasks')
+  @Roles(Role.Teacher)
+  async getMyTasks(@Req() req: AuthenticatedRequest) {
+    const userId = req.user.sub;
+
+    return this.taskService.findByTeacherId(userId);
   }
 }
