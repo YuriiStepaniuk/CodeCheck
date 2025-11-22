@@ -2,7 +2,11 @@ import { TaskDifficulty } from '@/app/(roles)/teacher/tasks/create/create-task-s
 
 export interface Task {
   id: string;
-  starterCode: string;
+  title: string;
+  description: string;
+  entryFunctionName: string;
+  starterCode: Record<string, string>;
+  language: string;
   difficulty: TaskDifficulty;
   points: number;
   createdAt: Date;

@@ -10,6 +10,7 @@ import { TeacherModule } from './teacher/teacher.module';
 import { TaskModule } from './task/task.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { AdminModule } from './admin/admin.module';
+import { CodeModule } from './shared/code/code.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { AdminModule } from './admin/admin.module';
     TaskModule,
     AssignmentModule,
     AdminModule,
+    CodeModule,
   ],
   controllers: [],
   providers: [],

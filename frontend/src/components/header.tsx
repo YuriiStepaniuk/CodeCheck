@@ -50,7 +50,7 @@ export default function Header() {
               Dashboard
             </Link>
             <Link
-              href="/tasks"
+              href="/student/task"
               className="text-gray-700 dark:text-gray-300 hover:text-blue-500"
             >
               Tasks

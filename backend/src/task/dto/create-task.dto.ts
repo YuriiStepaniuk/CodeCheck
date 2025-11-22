@@ -5,20 +5,53 @@ import {
   IsArray,
   ValidateNested,
   ArrayMinSize,
+  IsNotEmpty,
+  Min,
+  IsOptional,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Transform, Type, TransformFnParams } from 'class-transformer';
 import { TaskDifficulty } from '../types/task-difficulty';
 import { Language } from '../types/language';
 
-class TestCaseDto {
-  @IsString()
-  input: string;
+export class TestCaseDto {
+  @IsArray()
+  @Transform(({ value }: TransformFnParams) => {
+    if (typeof value === 'string') {
+      return JSON.parse(value) as unknown;
+    }
+    return value as unknown;
+  })
+  input: any[];
 
+  @IsNotEmpty()
+  @Transform(({ value }: TransformFnParams) => {
+    if (typeof value === 'string') {
+      return JSON.parse(value) as unknown;
+    }
+    return value as unknown;
+  })
+  expectedOutput: any;
+}
+
+export class HintDto {
   @IsString()
-  expectedOutput: string;
+  @IsNotEmpty()
+  message: string;
+
+  @IsInt()
+  @Min(0)
+  cost: number;
 }
 
 export class CreateTaskDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
   @IsEnum(TaskDifficulty)
   difficulty: TaskDifficulty;
 
@@ -28,6 +61,9 @@ export class CreateTaskDto {
   @IsString()
   starterCode: string;
 
+  @IsString()
+  entryFunctionName: string;
+
   @IsEnum(Language)
   language: Language;
 
@@ -36,4 +72,10 @@ export class CreateTaskDto {
   @ValidateNested({ each: true })
   @Type(() => TestCaseDto)
   testCases: TestCaseDto[];
+
+  @IsArray()
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => HintDto)
+  hints?: HintDto[];
 }

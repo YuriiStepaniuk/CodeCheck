@@ -12,5 +12,6 @@ export const API_URL = {
   TASKS: {
     CREATE_TASK: '/tasks',
     MY_TASKS: '/tasks/my-tasks',
+    AVAILABLE_TASKS: '/tasks/available-tasks',
   },
 } as const;
