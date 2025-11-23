@@ -1,0 +1,92 @@
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import OpenAI from 'openai';
+
+@Injectable()
+export class AiService {
+  private openai: OpenAI;
+
+  constructor(private configService: ConfigService) {
+    this.openai = new OpenAI({
+      apiKey: this.configService.get<string>('OPEN_AI_KEY'),
+    });
+  }
+
+  async generateHint(
+    taskTitle: string,
+    taskDescription: string,
+    userCode: string,
+    failureContext: {
+      input?: any;
+      expected?: any;
+      actual?: any;
+      error?: string; // Runtime error message
+    },
+  ): Promise<string> {
+    try {
+      // 1. Construct the "Tutor" Persona
+      const systemPrompt = `
+        You are a friendly and encouraging coding tutor.
+        A student is stuck on a programming task.
+        
+        GOAL: Help them fix their error without giving the full solution.
+        
+        GUIDELINES:
+        - If there is a Syntax/Runtime Error: Explain what the error message means in simple terms.
+        - If there is a Logic Error (Wrong Output): Ask a guiding question to help them find the bug.
+        - Keep it short (max 3 sentences).
+        - DO NOT write the corrected code block.
+      `;
+
+      // 2. Build the specific context based on failure type
+      let errorDetails = '';
+
+      if (failureContext.error) {
+        errorDetails = `
+        The code crashed with this error:
+        "${failureContext.error}"
+        `;
+      } else {
+        errorDetails = `
+        The code ran but failed a test case.
+        Input: ${JSON.stringify(failureContext.input)}
+        Expected Output: ${JSON.stringify(failureContext.expected)}
+        Actual User Output: ${JSON.stringify(failureContext.actual)}
+        `;
+      }
+
+      const userPrompt = `
+        Task: "${taskTitle}"
+        Instructions: ${taskDescription}
+
+        Student's Code:
+        \`\`\`javascript
+        ${userCode}
+        \`\`\`
+
+        ${errorDetails}
+
+        Provide a helpful hint.
+      `;
+
+      // 3. Call OpenAI
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o', // or 'gpt-3.5-turbo' to save money
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+      });
+
+      return (
+        response.choices[0].message.content || 'Keep trying, you are close!'
+      );
+    } catch (error) {
+      console.error('AI Error:', error);
+      throw new InternalServerErrorException(
+        'AI tutor is currently unavailable.',
+      );
+    }
+  }
+}

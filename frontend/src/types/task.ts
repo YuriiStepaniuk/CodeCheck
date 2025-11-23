@@ -13,3 +13,35 @@ export interface Task {
   updatedAt: Date;
   testCases: { input: string; expectedOutput: string }[];
 }
+
+export interface ExecutionSuccess {
+  success: boolean;
+  allPassed: boolean;
+  totalTests: number;
+  passedTests: number;
+  results: TestCaseResult[];
+  error?: string;
+}
+
+export interface ExecutionError {
+  success: false;
+  error: string;
+  details?: string;
+}
+
+export interface TestCaseResult {
+  input: any[];
+  expectedOutput: any;
+  actual: any;
+  passed: boolean;
+  error?: string;
+}
+
+export interface FailureContext {
+  input?: any;
+  expected?: any;
+  actual?: any;
+  error?: string;
+}
+
+export type ExecutionResult = ExecutionSuccess | ExecutionError;

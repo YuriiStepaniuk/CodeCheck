@@ -11,6 +11,7 @@ import { TaskModule } from './task/task.module';
 import { AssignmentModule } from './assignment/assignment.module';
 import { AdminModule } from './admin/admin.module';
 import { CodeModule } from './shared/code/code.module';
+import { AiModule } from './shared/ai/ai.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CodeModule } from './shared/code/code.module';
     AssignmentModule,
     AdminModule,
     CodeModule,
+    AiModule,
   ],
   controllers: [],
   providers: [],
