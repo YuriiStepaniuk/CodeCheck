@@ -10,6 +10,10 @@ export class StudentService {
     private readonly studentRepo: Repository<Student>,
   ) {}
 
+  async findByUserId(userId: string) {
+    return this.studentRepo.findOneBy({ userId });
+  }
+
   async findAll(): Promise<Student[]> {
     return this.studentRepo.find();
   }

@@ -48,6 +48,12 @@ export class StudentTask {
   @Column({ type: 'text', nullable: true })
   feedback: string | null;
 
+  @Column({ type: 'int', default: 0 })
+  hintsUsed: number;
+
+  @Column({ type: 'int', default: 0 })
+  attempts: number;
+
   @CreateDateColumn()
   assignedAt: Date;
 

@@ -5,13 +5,9 @@ import Editor from '@monaco-editor/react';
 import { useGetTask } from '@/hooks/tasks/useGetTask';
 import { Loader2 } from 'lucide-react';
 import { Language } from '@/app/(roles)/teacher/tasks/create/create-task-schema';
-
-// 1. Import Components
 import { IdeHeader } from './_components/ide-header';
 import { TaskInstructions } from './_components/task-instructions';
 import { OutputConsole } from './_components/output-console';
-
-// 2. Import Custom Hooks
 import { useExecuteCode } from '@/hooks/ide/useExecuteCode';
 import { useGetAiHint } from '@/hooks/ide/useGetAiHint';
 
