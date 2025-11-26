@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AssignmentStatus, StudentTask } from './entities/student-task.entity';
 import { StudentService } from '../student/student.service';
+import { ASSIGNMENT_CONSTANTS } from './constants/assignment.constants';
+import { TaskService } from '../task/task.service';
 
 @Injectable()
 export class StudentTaskService {
@@ -10,7 +12,19 @@ export class StudentTaskService {
     @InjectRepository(StudentTask)
     private repo: Repository<StudentTask>,
     private readonly studentService: StudentService,
+    private readonly taskService: TaskService,
   ) {}
+
+  async getStudentGrades(userId: string): Promise<StudentTask[]> {
+    const student = await this.studentService.findByUserId(userId);
+    if (!student) throw new NotFoundException('Student not found');
+
+    return this.repo.find({
+      where: { student: { id: student.id } },
+      relations: ['task', 'task.teacher'],
+      order: { updatedAt: 'DESC' },
+    });
+  }
 
   async incrementHintUsage(userId: string, taskId: string): Promise<void> {
     const student = await this.studentService.findByUserId(userId);
@@ -43,18 +57,19 @@ export class StudentTaskService {
     const student = await this.studentService.findByUserId(userId);
     if (!student) throw new NotFoundException('Student profile not found');
 
+    const task = await this.taskService.findById(taskId);
+    if (!task) throw new NotFoundException('Task was not found');
+
     let assignment = await this.repo.findOne({
       where: {
         student: { id: student.id },
         task: { id: taskId },
       },
-      relations: ['task'],
     });
-
     if (!assignment) {
       assignment = this.repo.create({
         student: student,
-        task: { id: taskId },
+        task: task,
         hintsUsed: 0,
         attempts: 1,
         status: AssignmentStatus.ASSIGNED,
@@ -66,10 +81,8 @@ export class StudentTaskService {
       return this.repo.save(assignment);
     }
 
-    const maxPoints = assignment.task?.points || 10;
-    const HINT_COST = 5;
-
-    const penalty = assignment.hintsUsed * HINT_COST;
+    const maxPoints = assignment.task.points;
+    const penalty = assignment.hintsUsed * ASSIGNMENT_CONSTANTS.HINT_COST;
     const finalGrade = Math.max(0, maxPoints - penalty);
 
     assignment.status = AssignmentStatus.GRADED;

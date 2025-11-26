@@ -7,7 +7,8 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 
 export const useRegister = () => {
   return useMutation({
-    mutationFn: (data: RegisterUserSchema) => authService.register(data),
+    mutationFn: (data: Omit<RegisterUserSchema, 'confirmPassword'>) =>
+      authService.register(data),
     onSuccess: (data) => {
       useAuthStore.getState().setUser(data);
       toast.success('Registered successfully!');

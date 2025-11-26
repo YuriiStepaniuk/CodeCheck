@@ -8,12 +8,12 @@ import { LogoutResponse } from '@/types/auth';
 class AuthService {
   constructor() {}
 
-  async register(data: RegisterUserSchema) {
+  async register(data: Omit<RegisterUserSchema, 'confirmPassword'>) {
     const response = await axiosClient.post<UserResponse>(
       API_URL.AUTH.REGISTER,
       data
     );
-
+    console.log(response);
     return response.data.user;
   }
 

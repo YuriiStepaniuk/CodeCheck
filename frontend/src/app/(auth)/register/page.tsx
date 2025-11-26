@@ -30,7 +30,8 @@ const RegisterPage = () => {
   const { mutate: registerUser, isPending } = useRegister();
 
   const onSubmit = async (data: RegisterUserSchema) => {
-    registerUser(data);
+    const { confirmPassword, ...payload }: RegisterUserSchema = data;
+    registerUser(payload);
   };
 
   return (
