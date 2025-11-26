@@ -20,7 +20,12 @@ export class CodeController {
     );
 
     if (result.success && result.allPassed) {
-      await this.studentTaskService.recordSuccess(userId, dto.taskId);
+      await this.studentTaskService.recordSuccess(
+        userId,
+        dto.taskId,
+        dto.code,
+        dto.language,
+      );
     }
 
     return result;

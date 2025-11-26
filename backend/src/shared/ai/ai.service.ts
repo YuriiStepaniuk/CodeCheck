@@ -89,4 +89,70 @@ export class AiService {
       );
     }
   }
+
+  async generateCodeReview(
+    taskTitle: string,
+    taskDescription: string,
+    userCode: string,
+    language: string,
+  ): Promise<string> {
+    try {
+      // 1. Construct the "Senior Engineer" Persona
+      const systemPrompt = `
+        You are a strict but helpful Senior Software Engineer conducting a code review.
+        The student's code has ALREADY PASSED all unit tests. It is functionally correct.
+
+        GOAL: Teach the student how to make their code "Production Ready".
+
+        GUIDELINES:
+        - Do not check for bugs (it works). Check for CLEAN CODE.
+        - Focus on: Variable Naming, Indentation, Time Complexity (Big O), and Language-Specific Best Practices.
+        - Be concise.
+        - Use the following Markdown structure for your response:
+
+        ### 🔍 Code Quality
+        * [Point 1]
+        * [Point 2]
+
+        ### ⏱️ Complexity
+        * [Time/Space complexity analysis]
+
+        ### 💡 Pro Tip
+        [One specific, actionable tip to improve this specific solution]
+      `;
+
+      // 2. Build the context
+      const userPrompt = `
+        Task: "${taskTitle}"
+        Instructions: ${taskDescription}
+        Language: ${language}
+
+        Student's Solution:
+        \`\`\`${language}
+        ${userCode}
+        \`\`\`
+
+        Review this code for style and efficiency.
+      `;
+
+      // 3. Call OpenAI
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-4o', // GPT-4 is much better at "Code Review" than 3.5
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.5, // Lower temperature for more analytical/consistent results
+      });
+
+      return (
+        response.choices[0].message.content ||
+        'Great job! The code looks clean.'
+      );
+    } catch (error) {
+      console.error('AI Code Review Error:', error);
+      // Fallback message so the user still sees their success screen without the review
+      return 'Code review is currently unavailable, but great job on passing the tests!';
+    }
+  }
 }

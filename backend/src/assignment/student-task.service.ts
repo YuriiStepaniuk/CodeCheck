@@ -5,6 +5,8 @@ import { AssignmentStatus, StudentTask } from './entities/student-task.entity';
 import { StudentService } from '../student/student.service';
 import { ASSIGNMENT_CONSTANTS } from './constants/assignment.constants';
 import { TaskService } from '../task/task.service';
+import { Language } from '../task/types/language';
+import { AiService } from '../shared/ai/ai.service';
 
 @Injectable()
 export class StudentTaskService {
@@ -13,6 +15,7 @@ export class StudentTaskService {
     private repo: Repository<StudentTask>,
     private readonly studentService: StudentService,
     private readonly taskService: TaskService,
+    private readonly aiService: AiService,
   ) {}
 
   async getStudentGrades(userId: string): Promise<StudentTask[]> {
@@ -53,7 +56,12 @@ export class StudentTaskService {
     }
   }
 
-  async recordSuccess(userId: string, taskId: string): Promise<StudentTask> {
+  async recordSuccess(
+    userId: string,
+    taskId: string,
+    userCode: string,
+    language: Language,
+  ): Promise<StudentTask> {
     const student = await this.studentService.findByUserId(userId);
     if (!student) throw new NotFoundException('Student profile not found');
 
@@ -89,6 +97,22 @@ export class StudentTaskService {
     assignment.grade = finalGrade;
     assignment.attempts += 1;
     assignment.feedback = `Passed with ${assignment.hintsUsed} hints used.`;
+
+    try {
+      const aiFeedback = await this.aiService.generateCodeReview(
+        task.title,
+        task.description,
+        userCode,
+        language,
+      );
+
+      // Append AI review to the standard message
+      assignment.feedback = `Passed with ${assignment.hintsUsed} hints used.\n\n${aiFeedback}`;
+    } catch (error) {
+      console.error('AI Review Generation Failed:', error);
+      // Fallback message
+      assignment.feedback = `Passed with ${assignment.hintsUsed} hints used.`;
+    }
 
     return this.repo.save(assignment);
   }

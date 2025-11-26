@@ -12,6 +12,7 @@ import { GetHintDto } from './dtos/get-hint.dto';
 import { CurrentUser } from '../decorators/current-user.decorator';
 import { JwtPayload } from '../../auth/jwt/jwt-payload';
 import { StudentTaskService } from '../../assignment/student-task.service';
+import { EvaluateCodeDto } from './dtos/evaluate-code.dto';
 
 @Controller('ai')
 @UseGuards(JwtAuthGuard)
@@ -40,5 +41,20 @@ export class AiController {
     return typeof hintResponse === 'string'
       ? { hint: hintResponse }
       : hintResponse;
+  }
+
+  @Post('review')
+  async evaluateCode(@Body() dto: EvaluateCodeDto) {
+    const task = await this.taskService.findById(dto.taskId);
+    if (!task) throw new NotFoundException('Task not found');
+
+    const review = await this.aiService.generateCodeReview(
+      task.title,
+      task.description,
+      dto.userCode,
+      dto.language,
+    );
+
+    return { review };
   }
 }

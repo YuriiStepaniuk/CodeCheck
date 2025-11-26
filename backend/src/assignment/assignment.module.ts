@@ -5,9 +5,15 @@ import { StudentTaskService } from './student-task.service';
 import { StudentModule } from '../student/student.module';
 import { StudentTaskController } from './student-task.controller';
 import { TaskModule } from '../task/task.module';
+import { AiModule } from '../shared/ai/ai.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StudentTask]), StudentModule, TaskModule],
+  imports: [
+    TypeOrmModule.forFeature([StudentTask]),
+    StudentModule,
+    TaskModule,
+    AiModule,
+  ],
   exports: [StudentTaskService],
   providers: [StudentTaskService],
   controllers: [StudentTaskController],
