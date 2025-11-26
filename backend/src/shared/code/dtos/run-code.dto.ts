@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { Language } from '../../../task/types/language';
 
 export class RunCodeDto {
   @IsString()
@@ -7,7 +8,7 @@ export class RunCodeDto {
 
   @IsString()
   @IsNotEmpty()
-  language: string;
+  language: Language;
 
   @IsUUID()
   @IsNotEmpty()

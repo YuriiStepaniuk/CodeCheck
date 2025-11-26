@@ -11,6 +11,7 @@ export enum Language {
   TS = 'TS',
   C = 'C',
   CSharp = 'C#',
+  Python = 'Python',
 }
 
 export type Hint = {

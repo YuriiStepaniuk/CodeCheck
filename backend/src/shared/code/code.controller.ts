@@ -13,7 +13,11 @@ export class CodeController {
 
   @Post('submit')
   async submitSolution(@Body() dto: RunCodeDto, @CurrentUser() userId: string) {
-    const result = await this.codeService.submitSolution(dto.code, dto.taskId);
+    const result = await this.codeService.submitSolution(
+      dto.code,
+      dto.taskId,
+      dto.language,
+    );
 
     if (result.success && result.allPassed) {
       await this.studentTaskService.recordSuccess(userId, dto.taskId);
