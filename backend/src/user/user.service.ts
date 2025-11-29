@@ -10,6 +10,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { HashService } from '../shared/hash/hash.service';
 import { Role } from './types/role.enum';
+import { ChangePasswordDto } from '../teacher/dto/change-password.dto';
 
 @Injectable()
 export class UserService {
@@ -24,6 +25,10 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userRepository.findOneBy({ email });
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.userRepository.findOneBy({ id });
   }
 
   async create(
@@ -92,5 +97,27 @@ export class UserService {
     }
 
     return this.userRepository.delete(id);
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      select: ['id', 'password'],
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isMatch = await this.hashService.compare(
+      dto.oldPassword,
+      user.password,
+    );
+    if (!isMatch) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    const hashedPassword = await this.hashService.hash(dto.newPassword);
+    await this.userRepository.update(user.id, { password: hashedPassword });
   }
 }

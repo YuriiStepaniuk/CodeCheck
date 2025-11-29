@@ -7,6 +7,7 @@ import { Role } from '../user/types/role.enum';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './task.entity';
 import { CurrentUser } from '../shared/decorators/current-user.decorator';
+import { AuthenticatedUser } from '../auth/jwt/jwt-payload';
 
 @Controller('tasks')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -16,16 +17,16 @@ export class TaskController {
   @Post()
   @Roles(Role.Teacher)
   async createTask(
-    @CurrentUser('sub') userId: string,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() data: CreateTaskDto,
   ): Promise<Task> {
-    return this.taskService.create(data, userId);
+    return this.taskService.create(data, user.userId);
   }
 
   @Get('my-tasks')
   @Roles(Role.Teacher)
-  async getMyTasks(@CurrentUser('sub') userId: string) {
-    return this.taskService.findByTeacherId(userId);
+  async getMyTasks(@CurrentUser() user: AuthenticatedUser) {
+    return this.taskService.findByTeacherId(user.userId);
   }
 
   @Get('available-tasks')

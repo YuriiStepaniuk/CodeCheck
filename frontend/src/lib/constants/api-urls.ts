@@ -14,4 +14,9 @@ export const API_URL = {
     MY_TASKS: '/tasks/my-tasks',
     AVAILABLE_TASKS: '/tasks/available-tasks',
   },
+
+  TEACHER: {
+    GET_ME: '/teachers/get-me',
+    CHANGE_PASSWORD: '/teachers/password',
+  },
 } as const;

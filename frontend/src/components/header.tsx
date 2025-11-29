@@ -14,6 +14,24 @@ import {
 import { useLogout } from '@/hooks/user/useLogout';
 import { useAuthStore } from '@/lib/stores/auth-store';
 
+const ROLE_NAVIGATION = {
+  STUDENT: [
+    { label: 'Home', href: '/' },
+    { label: 'My Grades', href: '/student/grade' },
+    { label: 'Tasks', href: '/student/task' },
+  ],
+  TEACHER: [
+    { label: 'Home', href: '/' },
+    { label: 'Create Task', href: '/teacher/tasks/create' },
+    { label: 'My Profile', href: '/teacher/profile' },
+    { label: 'Gradebook', href: '/teacher/grades' },
+  ],
+  ADMIN: [
+    { label: 'Dashboard', href: '/admin' },
+    { label: 'Users', href: '/admin/users' },
+  ],
+};
+
 export default function Header() {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -22,6 +40,11 @@ export default function Header() {
   const handleLogout = () => {
     logout();
   };
+
+  const currentNavItems =
+    user && user.role
+      ? ROLE_NAVIGATION[user.role as keyof typeof ROLE_NAVIGATION] || []
+      : [];
 
   return (
     <header className="w-full bg-white dark:bg-gray-900 shadow-md">
@@ -35,26 +58,17 @@ export default function Header() {
             </span>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation - Dynamic Rendering */}
           <nav className="hidden md:flex space-x-4">
-            <Link
-              href="/"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-500"
-            >
-              Home
-            </Link>
-            <Link
-              href="/dashboard"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-500"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/student/task"
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-500"
-            >
-              Tasks
-            </Link>
+            {currentNavItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-500 transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           {/* Auth Section */}
@@ -62,17 +76,24 @@ export default function Header() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center space-x-2">
-                    <Avatar className="w-10 h-10">
+                  <button className="flex items-center space-x-2 outline-none">
+                    <Avatar className="w-10 h-10 border border-gray-200">
+                      {/* Optional: Use a specific image based on role or user data */}
                       <AvatarImage src="https://github.com/shadcn.png" />
                       <AvatarFallback>
-                        {user.firstName[0]}
-                        {user.lastName[0]}
+                        {user.firstName?.[0]}
+                        {user.lastName?.[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-gray-700 dark:text-gray-200">
-                      {user.firstName}
-                    </span>
+                    <div className="flex flex-col items-start text-sm">
+                      <span className="font-medium text-gray-700 dark:text-gray-200">
+                        {user.firstName}
+                      </span>
+                      {/* Optional: Display the role under the name */}
+                      <span className="text-xs text-gray-500 capitalize">
+                        {user.role?.toLowerCase()}
+                      </span>
+                    </div>
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

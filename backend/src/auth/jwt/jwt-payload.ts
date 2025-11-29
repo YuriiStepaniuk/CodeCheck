@@ -5,3 +5,9 @@ export interface JwtPayload {
   email: string;
   role: Role;
 }
+
+export interface AuthenticatedUser {
+  userId: string;
+  email: string;
+  role: Role;
+}
