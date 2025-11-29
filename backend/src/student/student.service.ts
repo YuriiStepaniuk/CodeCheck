@@ -30,4 +30,8 @@ export class StudentService {
 
     return repository.save(student);
   }
+
+  save(student: Student) {
+    return this.studentRepo.save(student);
+  }
 }

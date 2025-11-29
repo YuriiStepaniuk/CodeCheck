@@ -10,6 +10,7 @@ import {
 import { User } from '../user/user.entity';
 import { Task } from '../task/task.entity';
 import { StudentTask } from '../assignment/entities/student-task.entity';
+import { Group } from '../group/group.entity';
 
 @Entity('teacher')
 export class Teacher {
@@ -28,6 +29,9 @@ export class Teacher {
 
   @OneToMany(() => StudentTask, (st) => st.assignedBy)
   assignedTasks: StudentTask[];
+
+  @OneToMany(() => Group, (group) => group.teacher)
+  groups: Group[];
 
   @CreateDateColumn()
   joinedAt: Date;

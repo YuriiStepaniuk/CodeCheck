@@ -12,6 +12,7 @@ import { AssignmentModule } from './assignment/assignment.module';
 import { AdminModule } from './admin/admin.module';
 import { CodeModule } from './shared/code/code.module';
 import { AiModule } from './shared/ai/ai.module';
+import { GroupModule } from './group/group.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { AiModule } from './shared/ai/ai.module';
     AdminModule,
     CodeModule,
     AiModule,
+    GroupModule,
   ],
   controllers: [],
   providers: [],

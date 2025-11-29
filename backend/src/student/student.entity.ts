@@ -3,12 +3,14 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { StudentTask } from '../assignment/entities/student-task.entity';
+import { Group } from '../group/group.entity';
 
 @Entity('student')
 export class Student {
@@ -25,8 +27,8 @@ export class Student {
   @OneToMany(() => StudentTask, (studentTask) => studentTask.student)
   assignedTasks: StudentTask[];
 
-  @Column({ nullable: true })
-  group: string;
+  @ManyToOne(() => Group, (group) => group.students)
+  group: Group;
 
   @CreateDateColumn()
   enrolledAt: Date;

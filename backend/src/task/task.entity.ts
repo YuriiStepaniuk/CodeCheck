@@ -11,6 +11,7 @@ import { Teacher } from '../teacher/teacher.entity';
 import { StudentTask } from '../assignment/entities/student-task.entity';
 import { TaskDifficulty } from './types/task-difficulty';
 import { Language } from './types/language';
+import { Group } from '../group/group.entity';
 
 @Entity('task')
 export class Task {
@@ -65,6 +66,9 @@ export class Task {
     onDelete: 'CASCADE',
   })
   teacher: Teacher;
+
+  @ManyToOne(() => Group, (group) => group.tasks)
+  group: Group;
 
   @OneToMany(() => StudentTask, (st) => st.task)
   studentAssignments: StudentTask[];

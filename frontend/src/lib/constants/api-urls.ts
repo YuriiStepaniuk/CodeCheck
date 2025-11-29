@@ -18,5 +18,6 @@ export const API_URL = {
   TEACHER: {
     GET_ME: '/teachers/get-me',
     CHANGE_PASSWORD: '/teachers/password',
+    CREATE_INVITE_LINK: '/groups',
   },
 } as const;
