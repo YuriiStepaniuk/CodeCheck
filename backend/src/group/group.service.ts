@@ -35,7 +35,9 @@ export class GroupService {
   }
 
   async assignGroup(userId: string, inviteCode: string): Promise<void> {
-    const student = await this.studentService.findByUserId(userId);
+    const student = await this.studentService.findByUserId(userId, {
+      groups: true,
+    });
     const group = await this.groupRepository.findOneBy({
       inviteCode: inviteCode,
     });
@@ -47,7 +49,12 @@ export class GroupService {
       throw new NotFoundException('Group not found');
     }
 
-    student.group = group;
+    const alreadyInGroup = student.groups.some((g) => g.id === group.id);
+    if (alreadyInGroup) {
+      throw new BadRequestException('You are already a member of this class');
+    }
+
+    student.groups.push(group);
     await this.studentService.save(student);
   }
 }

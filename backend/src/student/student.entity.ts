@@ -3,7 +3,8 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -27,8 +28,9 @@ export class Student {
   @OneToMany(() => StudentTask, (studentTask) => studentTask.student)
   assignedTasks: StudentTask[];
 
-  @ManyToOne(() => Group, (group) => group.students)
-  group: Group;
+  @ManyToMany(() => Group, (group) => group.students)
+  @JoinTable()
+  groups: Group[];
 
   @CreateDateColumn()
   enrolledAt: Date;

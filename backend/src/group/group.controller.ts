@@ -9,10 +9,10 @@ import { AuthenticatedUser } from '../auth/jwt/jwt-payload';
 import { CurrentUser } from '../shared/decorators/current-user.decorator';
 
 @Controller('groups')
+@UseGuards(JwtAuthGuard)
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Roles(Role.Teacher)
   @Post()
   async create(

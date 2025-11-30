@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, FindOptionsRelations, Repository } from 'typeorm';
 import { Student } from './student.entity';
 
 @Injectable()
@@ -10,8 +10,11 @@ export class StudentService {
     private readonly studentRepo: Repository<Student>,
   ) {}
 
-  async findByUserId(userId: string) {
-    return this.studentRepo.findOneBy({ userId });
+  async findByUserId(
+    userId: string,
+    relations: FindOptionsRelations<Student> = {},
+  ) {
+    return this.studentRepo.findOne({ where: { userId }, relations });
   }
 
   async findAll(): Promise<Student[]> {
@@ -33,5 +36,16 @@ export class StudentService {
 
   save(student: Student) {
     return this.studentRepo.save(student);
+  }
+
+  async getStudentGroups(userId: string) {
+    const student = await this.findByUserId(userId, {
+      groups: {
+        teacher: {
+          user: true,
+        },
+      },
+    });
+    return student?.groups || [];
   }
 }
