@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { JwtAuthGuard } from '../auth/jwt/jwt-auth.guard';
 import { RolesGuard } from '../shared/guards/roles.guard';
@@ -31,8 +39,8 @@ export class TaskController {
 
   @Get('available-tasks')
   @Roles(Role.Student)
-  async getAvailableTasks() {
-    return this.taskService.findTasksForStudent();
+  async getAvailableTasks(@Query('groupId') groupId: string) {
+    return this.taskService.findTasksForStudent(groupId);
   }
 
   @Get(':id')

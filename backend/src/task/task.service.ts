@@ -1,16 +1,18 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './task.entity';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { TeacherService } from '../teacher/teacher.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Language } from './types/language';
+import { GroupService } from '../group/group.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(Task) private readonly taskRepo: Repository<Task>,
     private readonly teacherService: TeacherService,
+    private readonly groupService: GroupService,
   ) {}
 
   async findAll(): Promise<Task[]> {
@@ -26,9 +28,19 @@ export class TaskService {
     return task;
   }
 
-  async findTasksForStudent() {
+  async findTasksForStudent(groupId?: string) {
+    const where: FindOptionsWhere<Task> = {};
+
+    if (groupId) {
+      where.group = { id: groupId };
+    }
+
     return this.taskRepo.find({
-      relations: ['teacher'],
+      where,
+      relations: {
+        teacher: true,
+        group: true,
+      },
     });
   }
 
@@ -55,6 +67,12 @@ export class TaskService {
       throw new BadRequestException('Teacher profile not found');
     }
 
+    const group = await this.groupService.findById(dto.groupId);
+
+    if (!group) {
+      throw new BadRequestException('Group was not found');
+    }
+
     const entryFuncName = dto.entryFunctionName || 'solution';
 
     const codeContent =
@@ -76,6 +94,7 @@ export class TaskService {
       testCases: dto.testCases,
       hints: dto.hints ?? [],
       teacher,
+      group,
     });
 
     return this.taskRepo.save(task);

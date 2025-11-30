@@ -23,3 +23,5 @@ export interface GroupResponse {
   inviteCode: string;
   teacher: TeacherResponse;
 }
+
+export type SingleGroup = Omit<GroupResponse, 'teacher'>;

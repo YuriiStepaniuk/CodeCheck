@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Get } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { JoinGroupDto } from './dto/join-group.dto';
@@ -29,5 +29,11 @@ export class GroupController {
     @Body() dto: JoinGroupDto,
   ) {
     return this.groupService.assignGroup(user.userId, dto.inviteCode);
+  }
+
+  @Get('all-groups')
+  @Roles(Role.Teacher)
+  async findAllGroups() {
+    return this.groupService.findAll();
   }
 }

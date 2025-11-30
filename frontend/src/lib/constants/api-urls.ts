@@ -19,5 +19,6 @@ export const API_URL = {
     GET_ME: '/teachers/get-me',
     CHANGE_PASSWORD: '/teachers/password',
     CREATE_INVITE_LINK: '/groups',
+    GROUPS: '/groups/all-groups',
   },
 } as const;

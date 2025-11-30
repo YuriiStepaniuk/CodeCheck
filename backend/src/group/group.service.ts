@@ -57,4 +57,12 @@ export class GroupService {
     student.groups.push(group);
     await this.studentService.save(student);
   }
+
+  async findAll() {
+    return this.groupRepository.find();
+  }
+
+  async findById(groupId: string) {
+    return this.groupRepository.findOneBy({ id: groupId });
+  }
 }

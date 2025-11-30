@@ -39,6 +39,7 @@ export const createTaskSchema = z.object({
   starterCode: z.string().optional(),
   language: z.enum(Language),
   entryFunctionName: z.string(),
+  groupId: z.string(),
   testCases: z
     .array(
       z.object({

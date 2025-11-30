@@ -8,6 +8,7 @@ import {
   IsNotEmpty,
   Min,
   IsOptional,
+  IsUUID,
 } from 'class-validator';
 import { Transform, Type, TransformFnParams } from 'class-transformer';
 import { TaskDifficulty } from '../types/task-difficulty';
@@ -78,4 +79,7 @@ export class CreateTaskDto {
   @ValidateNested({ each: true })
   @Type(() => HintDto)
   hints?: HintDto[];
+
+  @IsUUID()
+  groupId: string;
 }

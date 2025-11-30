@@ -28,6 +28,7 @@ import {
 } from './create-task-schema';
 import { teacherService } from '@/services/teacher-service';
 import { Textarea } from '@/components/ui/textarea';
+import { useGetGroups } from '@/hooks/teacher/useGetGroups';
 
 export default function CreateTaskPage() {
   const defaultValues: DefaultValues<CreateTaskSchema> = {
@@ -38,9 +39,11 @@ export default function CreateTaskPage() {
     starterCode: '',
     entryFunctionName: 'solution',
     language: Language.JS,
+    groupId: '',
     testCases: [{ input: '[]', expectedOutput: '' }],
     hints: [] as Hint[],
   };
+  const { data: groups } = useGetGroups();
 
   const form = useForm<CreateTaskSchema>({
     resolver: zodResolver(createTaskSchema),
@@ -144,6 +147,42 @@ export default function CreateTaskPage() {
               </Select>
             )}
           />
+        </div>
+
+        <div>
+          <label className="text-sm font-medium">Assign to Group</label>
+
+          <Controller
+            name="groupId"
+            control={form.control}
+            render={({ field }) => (
+              <Select onValueChange={field.onChange} value={field.value}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a group" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {groups?.length === 0 && (
+                    <div className="text-muted-foreground p-2 text-sm">
+                      No groups found
+                    </div>
+                  )}
+
+                  {groups?.map((g) => (
+                    <SelectItem key={g.id} value={g.id}>
+                      {g.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+
+          {form.formState.errors.groupId && (
+            <p className="text-red-500 text-xs mt-1">
+              {form.formState.errors.groupId.message}
+            </p>
+          )}
         </div>
 
         <div>
