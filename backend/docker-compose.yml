@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  # This is your Persistent C# Runner
+  csharp-sandbox:
+    image: chsarp-sandbox # The image you built
+    container_name: chsarp-sandbox
+    init: true
+    volumes:
+      # Maps your local 'temp_scripts' folder to the container
+      - ./temp_scripts:/app/scripts
+    # Keeps it running forever
+    command: tail -f /dev/null

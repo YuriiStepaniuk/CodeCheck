@@ -174,52 +174,129 @@ print(json.dumps({
 `;
   }
 
-  private buildCSharpScript(
+  public buildCSharpScript(
     userCode: string,
     testCases: TestCaseDto[],
     funcName: string,
   ): string {
-    // Simple prototype: student function should be a static method
+    const jsonString = JSON.stringify(testCases);
+    const base64Data = Buffer.from(jsonString).toString('base64');
+
     return `
 using System;
-using System.Text.Json;
 using System.Collections.Generic;
+using System.Text.Json;
+using System.Reflection;
+using System.Linq;
 
-public class Sandbox {
+// ========== USER CODE ==========
+public class Solution {
     ${userCode}
+}
 
+// ========== RUNNER ==========
+public class Program {
     public static void Main() {
-        var testCases = JsonSerializer.Deserialize<List<TestCase>>(@"${JSON.stringify(testCases).replace(/"/g, '\\"')}");
-        var results = new List<object>();
+        try {
+            string base64 = "${base64Data}";
+            string jsonString = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(base64));
+            
+            // Fix 1: Use a safer TestCase class structure
+            var testCases = JsonSerializer.Deserialize<List<TestCase>>(jsonString);
+            var results = new List<TestCaseResult>();
 
-        foreach(var t in testCases) {
-            try {
-                // Assuming user defined a static method with the right name
-                var method = typeof(Sandbox).GetMethod("${funcName}");
-                var args = t.input.ToArray(); // dynamic approach
-                var actual = method.Invoke(null, args);
-                bool passed = actual.Equals(t.expectedOutput);
-                t.actual = actual;
-                t.passed = passed;
-            } catch(Exception e) {
-                t.actual = null;
-                t.passed = false;
-                t.error = e.Message;
+            // Fix 2: Better Reflection to find the method (Public or Private, Static or Instance)
+            MethodInfo method = typeof(Solution).GetMethod("${funcName}", 
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+
+            if (method == null) {
+                // Return a JSON error immediately
+                Console.WriteLine(JsonSerializer.Serialize(new { error = "Method '${funcName}' not found." }));
+                return;
             }
-            results.Add(t);
-        }
 
-        Console.WriteLine(JsonSerializer.Serialize(results));
+            object instance = method.IsStatic ? null : Activator.CreateInstance(typeof(Solution));
+            ParameterInfo[] paramInfos = method.GetParameters();
+
+            foreach (var t in testCases) {
+                var resultObj = new TestCaseResult();
+                resultObj.input = t.input;
+                resultObj.expectedOutput = t.expectedOutput;
+
+                try {
+                    // Fix 3: Robust Input Parsing
+                    // The input is a single JsonElement representing the ARRAY [1, 2]
+                    // We must check if the argument count matches
+                    if (t.input.ValueKind != JsonValueKind.Array) {
+                         throw new Exception("Input must be an array of arguments.");
+                    }
+
+                    if (t.input.GetArrayLength() != paramInfos.Length) {
+                         throw new Exception($"Expected {paramInfos.Length} arguments, but got {t.input.GetArrayLength()}.");
+                    }
+
+                    object[] args = new object[paramInfos.Length];
+                    int index = 0;
+                    
+                    // Iterate manually through the JSON Array
+                    foreach (JsonElement element in t.input.EnumerateArray()) {
+                        // Deserialize strictly to the types the function expects (int, string, etc.)
+                        args[index] = JsonSerializer.Deserialize(element.GetRawText(), paramInfos[index].ParameterType);
+                        index++;
+                    }
+
+                    // EXECUTE
+                    object actualValue = method.Invoke(instance, args);
+
+                    // RESULT COMPARISON
+                    object expectedTyped = null;
+                    if (t.expectedOutput.ValueKind != JsonValueKind.Null) {
+                         expectedTyped = JsonSerializer.Deserialize(
+                            t.expectedOutput.GetRawText(), 
+                            method.ReturnType
+                         );
+                    }
+
+                    bool passed = false;
+                    if (actualValue == null && expectedTyped == null) passed = true;
+                    else if (actualValue != null) passed = actualValue.Equals(expectedTyped);
+
+                    resultObj.actual = actualValue;
+                    resultObj.passed = passed;
+
+                } catch (Exception ex) {
+                    var inner = ex.InnerException ?? ex;
+                    resultObj.passed = false;
+                    resultObj.error = inner.Message;
+                    resultObj.actual = null;
+                }
+                results.Add(resultObj);
+            }
+
+            Console.WriteLine(JsonSerializer.Serialize(results));
+        } 
+        catch (Exception globalEx) {
+            // This catches compilation/setup errors
+            Console.WriteLine(JsonSerializer.Serialize(new { error = globalEx.ToString() }));
+        }
     }
 
+    // Input DTO (Raw JSON)
     public class TestCase {
-        public object[] input { get; set; }
-        public object expectedOutput { get; set; }
+        public JsonElement input { get; set; } // Represents the whole array [1, 2]
+        public JsonElement expectedOutput { get; set; }
+    }
+
+    // Output DTO (What we send back to Node)
+    public class TestCaseResult {
+        public JsonElement input { get; set; }
+        public JsonElement expectedOutput { get; set; }
         public object actual { get; set; }
         public bool passed { get; set; }
         public string error { get; set; }
     }
 }
-`;
+
+Program.Main();`;
   }
 }

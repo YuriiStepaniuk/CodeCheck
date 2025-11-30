@@ -27,15 +27,33 @@ export class CodeService {
       expectedOutput: tc.expectedOutput as unknown,
     }));
 
-    const script = this.scriptBuiledService.buildScript(
-      language,
-      userCode,
-      testCases,
-      task.entryFunctionName || 'solution',
-    );
+    let script: string;
 
+    if (language === Language.CSharp) {
+      // C# needs the complex builder we created (Base64, Reflection, etc.)
+      script = this.scriptBuiledService.buildCSharpScript(
+        userCode,
+        testCases,
+        task.entryFunctionName || 'solution',
+      );
+    } else {
+      // JS/Python use the standard builder
+      script = this.scriptBuiledService.buildScript(
+        language,
+        userCode,
+        testCases,
+        task.entryFunctionName || 'solution',
+      );
+    }
+
+    console.log(`[CodeService] Generated Script for ${language}`);
+
+    // 2. Execute (The Sandbox service now handles the Strategy: File vs STDIN)
     const execution = await this.sandbox.runInSandbox(script, language);
+
     if (execution.error) {
+      console.error('C# Execution Failed:', execution.error);
+
       return {
         success: false,
         error: ExecutionError.RUNTIME_ERROR,
@@ -44,7 +62,10 @@ export class CodeService {
       };
     }
 
-    const results = execution.result || [];
+    // 3. Process Results
+    // Note: C# runner returns an array of results directly in 'execution.result'
+    // JS/Python runners usually return the same structure based on your previous code
+    const results = Array.isArray(execution.result) ? execution.result : [];
     const passedCount = results.filter((r) => r.passed).length;
 
     return {
