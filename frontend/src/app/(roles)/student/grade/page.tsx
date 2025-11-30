@@ -3,14 +3,14 @@
 import { Loader2, CheckCircle, Trophy, BarChart3 } from 'lucide-react';
 import { StatCard } from './_components/stat-card';
 import { GradeRow } from './_components/grade-row';
-import { useGrades } from '@/hooks/student/useGrades';
+import { StudentTask, useGrades } from '@/hooks/student/useGrades';
 import { GradeDetailsModal } from './_components/grade-details-modal';
 import { useState } from 'react';
 
 export default function GradesPage() {
   const { grades, isLoading, stats } = useGrades();
 
-  const [selectedGrade, setSelectedGrade] = useState<any | null>(null);
+  const [selectedGrade, setSelectedGrade] = useState<StudentTask | null>(null);
   console.log(grades);
   if (isLoading) {
     return (

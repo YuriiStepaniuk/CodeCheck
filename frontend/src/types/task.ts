@@ -30,17 +30,17 @@ export interface ExecutionError {
 }
 
 export interface TestCaseResult {
-  input: any[];
-  expectedOutput: any;
-  actual: any;
+  input: unknown[];
+  expectedOutput: unknown;
+  actual: unknown;
   passed: boolean;
   error?: string;
 }
 
 export interface FailureContext {
-  input?: any;
-  expected?: any;
-  actual?: any;
+  input?: unknown;
+  expected?: unknown;
+  actual?: unknown;
   error?: string;
 }
 

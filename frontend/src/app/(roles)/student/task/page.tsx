@@ -13,6 +13,8 @@ import { useState } from 'react';
 
 import { useGetTasksByGroup } from '@/hooks/tasks/useGetTasksByGroup';
 import { useGetGroups } from '@/hooks/teacher/useGetGroups';
+import { SingleGroup } from '@/types/group';
+import { Task } from '@/types/task';
 
 export default function StudentTasksPage() {
   const router = useRouter();
@@ -25,7 +27,6 @@ export default function StudentTasksPage() {
   const { data: tasks = [], isLoading: tasksLoading } = useGetTasksByGroup(
     searchGroupId || undefined
   );
-
   return (
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <h1 className="text-2xl font-bold mb-2">Tasks by Group</h1>
@@ -41,7 +42,7 @@ export default function StudentTasksPage() {
               <SelectValue placeholder="Choose group..." />
             </SelectTrigger>
             <SelectContent>
-              {groups.map((g: any) => (
+              {groups.map((g: SingleGroup) => (
                 <SelectItem key={g.id} value={g.id}>
                   {g.name}
                 </SelectItem>
@@ -68,7 +69,7 @@ export default function StudentTasksPage() {
           <p>No tasks found for this group.</p>
         )}
 
-        {tasks.map((task: any) => (
+        {tasks.map((task: Task) => (
           <div
             key={task.id}
             className="border p-4 rounded shadow flex justify-between items-center"

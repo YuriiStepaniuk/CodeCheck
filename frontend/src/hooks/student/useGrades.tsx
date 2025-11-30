@@ -6,6 +6,7 @@ export interface StudentTask {
   status: 'ASSIGNED' | 'GRADED';
   grade: number;
   hintsUsed: number;
+  feedback: string;
   attempts: number;
   updatedAt: string;
   task: {
