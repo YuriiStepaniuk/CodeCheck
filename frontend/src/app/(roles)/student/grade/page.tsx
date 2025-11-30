@@ -4,10 +4,14 @@ import { Loader2, CheckCircle, Trophy, BarChart3 } from 'lucide-react';
 import { StatCard } from './_components/stat-card';
 import { GradeRow } from './_components/grade-row';
 import { useGrades } from '@/hooks/student/useGrades';
+import { GradeDetailsModal } from './_components/grade-details-modal';
+import { useState } from 'react';
 
 export default function GradesPage() {
   const { grades, isLoading, stats } = useGrades();
 
+  const [selectedGrade, setSelectedGrade] = useState<any | null>(null);
+  console.log(grades);
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center gap-2 text-muted-foreground">
@@ -75,11 +79,21 @@ export default function GradesPage() {
         ) : (
           <div className="grid gap-3">
             {grades.map((task) => (
-              <GradeRow key={task.id} item={task} />
+              <GradeRow
+                key={task.id}
+                item={task}
+                onClick={() => setSelectedGrade(task)}
+              />
             ))}
           </div>
         )}
       </div>
+
+      <GradeDetailsModal
+        isOpen={!!selectedGrade}
+        grade={selectedGrade}
+        onClose={() => setSelectedGrade(null)}
+      />
     </div>
   );
 }

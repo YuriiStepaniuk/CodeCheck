@@ -1,15 +1,42 @@
+'use client';
+
 import Link from 'next/link';
+import { useRouter } from 'next/navigation'; // 1. Import useRouter
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Circle, AlertTriangle, ArrowRight } from 'lucide-react';
+import {
+  CheckCircle,
+  Circle,
+  AlertTriangle,
+  ArrowRight,
+  Eye,
+} from 'lucide-react';
 import { StudentTask } from '@/hooks/student/useGrades';
 
-export function GradeRow({ item }: { item: StudentTask }) {
+interface Props {
+  item: StudentTask;
+  onClick: () => void;
+}
+
+export function GradeRow({ item, onClick }: Props) {
+  const router = useRouter(); // 2. Initialize router
   const isGraded = item.status === 'GRADED';
   const penaltyPoints = item.hintsUsed * 5;
+  console.log(isGraded);
+  // 3. Define the split logic
+  const handleRowClick = () => {
+    if (isGraded) {
+      onClick(); // Open Modal
+    } else {
+      router.push(`/student/tasks/${item.task.id}`); // Navigate to Start Task
+    }
+  };
 
   return (
-    <div className="bg-white p-4 rounded-xl border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow group">
+    <div
+      onClick={handleRowClick} // 4. Use the new handler
+      className="bg-white p-4 rounded-xl border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 hover:shadow-md transition-shadow group cursor-pointer hover:border-primary/50"
+    >
       {/* LEFT: Info */}
       <div className="flex items-start gap-4">
         <div
@@ -71,16 +98,30 @@ export function GradeRow({ item }: { item: StudentTask }) {
           )}
         </div>
 
-        <Button
-          asChild
-          variant={isGraded ? 'outline' : 'default'}
-          className="min-w-[120px]"
-        >
-          <Link href={`/student/tasks/${item.task.id}`}>
-            {isGraded ? 'Review' : 'Start Task'}
-            {!isGraded && <ArrowRight className="ml-2 w-4 h-4" />}
-          </Link>
-        </Button>
+        {isGraded ? (
+          <Button
+            variant="outline"
+            className="min-w-[120px]"
+            onClick={(e) => {
+              e.stopPropagation(); // Stop row click
+              onClick(); // Open Modal
+            }}
+          >
+            <Eye className="mr-2 w-4 h-4" />
+            Details
+          </Button>
+        ) : (
+          <Button
+            asChild
+            className="min-w-[120px]"
+            onClick={(e) => e.stopPropagation()} // Stop row click so Link handles it
+          >
+            <Link href={`/student/tasks/${item.task.id}`}>
+              Start Task
+              <ArrowRight className="ml-2 w-4 h-4" />
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -17,14 +17,11 @@ import { useGetGroups } from '@/hooks/teacher/useGetGroups';
 export default function StudentTasksPage() {
   const router = useRouter();
 
-  // LOCAL STATE for selected group
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
   const [searchGroupId, setSearchGroupId] = useState<string | null>(null);
 
-  // Fetch groups for dropdown
   const { data: groups = [], isLoading: groupsLoading } = useGetGroups();
 
-  // Fetch tasks when Find button pressed
   const { data: tasks = [], isLoading: tasksLoading } = useGetTasksByGroup(
     searchGroupId || undefined
   );
@@ -33,7 +30,6 @@ export default function StudentTasksPage() {
     <div className="max-w-3xl mx-auto mt-8 space-y-6">
       <h1 className="text-2xl font-bold mb-2">Tasks by Group</h1>
 
-      {/* --- GROUP SELECT + FIND BUTTON --- */}
       <div className="flex gap-4 items-end">
         <div className="flex-1">
           <label className="text-sm font-medium">Select Group</label>
